@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: face-approval-system
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+    envVars:
+      - key: MONGODB_URL
+        value: your_mongodb_connection_string_here
+      - key: DATABASE_NAME
+        value: face_approval_system
