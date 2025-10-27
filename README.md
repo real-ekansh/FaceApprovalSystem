@@ -34,6 +34,14 @@ A secure web-based face recognition platform for member access management, built
 ---
 
 ## Installation Methods
+- [Local Setup](https://github.com/real-ekansh/FaceApprovalSystem/wiki#local-setup--development)
+
+
+- [Render / Heroku](https://github.com/real-ekansh/FaceApprovalSystem/wiki#render--heroku)
+
+- [Docker Deployment](https://github.com/real-ekansh/FaceApprovalSystem/wiki#docker-deployment)
+
+- [Vercel](https://github.com/real-ekansh/FaceApprovalSystem/wiki#vercel-serverless-api-only)
 
 ---
 
