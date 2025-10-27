@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Face Approval | Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h3>Menu</h3>
+      <a href="#" id="nav-intro">
+        <span class="material-icons">dashboard</span>
+        Dashboard
+      </a>
+      <a href="#" id="nav-face">
+        <span class="material-icons">face</span>
+        Face Recognition
+      </a>
+      <a href="#" id="nav-admin">
+        <span class="material-icons">admin_panel_settings</span>
+        Admin Panel
+      </a>
+      <div class="theme-toggle">
+        <span id="themeLabel">Light</span>
+        <div id="themeSwitch" class="toggle-switch">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+    </aside>
+    
+    <div class="main-content" id="mainContent">
+      <!-- Dashboard -->
+      <section id="introSection">
+        <h1>Welcome to Face Approval System</h1>
+        <p>Secure face recognition platform for member access management.</p>
+        <ul>
+          <li><strong>Face Recognition:</strong> Register your face or approve existing entry to start a session</li>
+          <li><strong>Admin Panel:</strong> Full control over member management, sessions, and system logs</li>
+          <li><strong>Persistent Storage:</strong> All data saved in database (survives refresh)</li>
+        </ul>
+        <button id="faceRecogniseBtn">
+          <span class="material-icons">face</span>
+          Start Face Recognition
+        </button>
+      </section>
+      
+      <!-- Face Recognition -->
+      <section id="faceSection" class="hidden">
+        <h2>Face Recognition</h2>
+        <p>Choose an option:</p>
+        <button id="addEntryBtn">
+          <span class="material-icons">person_add</span>
+          Register New Entry
+        </button>
+        <button id="approveFaceBtn">
+          <span class="material-icons">verified_user</span>
+          Approve My Face
+        </button>
+      </section>
+      
+      <!-- Camera Capture for Registration -->
+      <section id="cameraSection" class="hidden">
+        <h2>📸 Capture Your Face for Registration</h2>
+        <p>Position your face in the camera and click capture</p>
+        <div class="camera-container">
+          <video id="video" width="640" height="480" autoplay playsinline></video>
+          <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+        </div>
+        <div class="camera-controls">
+          <button id="captureBtn">
+            <span class="material-icons">photo_camera</span>
+            Capture Photo
+          </button>
+          <button id="cancelCameraBtn" class="secondary-btn">
+            <span class="material-icons">cancel</span>
+            Cancel
+          </button>
+        </div>
+        <div id="capturePreview" class="hidden">
+          <h3>✅ Photo Captured!</h3>
+          <img id="previewImage" src="" alt="Captured face">
+          <div class="camera-controls">
+            <button id="retakeBtn" class="secondary-btn">
+              <span class="material-icons">replay</span>
+              Retake
+            </button>
+            <button id="proceedToInfoBtn">
+              <span class="material-icons">arrow_forward</span>
+              Proceed to Information
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Add Info -->
+      <section id="addInfoSection" class="hidden">
+        <h2>📝 Your Information</h2>
+        <p>Fill in your details to complete registration</p>
+        <form id="addInfoForm">
+          <label>Full Name:</label>
+          <input name="name" type="text" placeholder="Enter your full name" required><br>
+          
+          <label>Class:</label>
+          <input name="class" type="text" placeholder="Enter your class" required><br>
+          
+          <label>Roll Number:</label>
+          <input name="roll" type="text" placeholder="Enter your roll number" required><br>
+          
+          <button type="submit">
+            <span class="material-icons">check_circle</span>
+            Complete Registration
+          </button>
+          <button type="button" class="secondary-btn" onclick="showSection('cameraSection')">
+            <span class="material-icons">arrow_back</span>
+            Back
+          </button>
+        </form>
+        <div id="addInfoSuccess" class="hidden">
+          <div class="success-box">
+            <span class="material-icons success-icon">check_circle</span>
+            <h3>🎉 Registration Successful!</h3>
+            <p>Welcome, <strong id="registeredName"></strong>!</p>
+            <p>Your unique access code:</p>
+            <div class="code-display">
+              <strong id="generatedString"></strong>
+            </div>
+            <p class="info-text">Save this code for your records</p>
+            <button onclick="handlePostRegistration()">
+              <span class="material-icons">face</span>
+              Go to Face Recognition
+            </button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Approve Face Camera -->
+      <section id="approveCameraSection" class="hidden">
+        <h2>🔐 Face Approval</h2>
+        <p>Position your face in the camera to verify identity</p>
+        <div class="camera-container">
+          <video id="approveVideo" width="640" height="480" autoplay playsinline></video>
+          <canvas id="approveCanvas" width="640" height="480" style="display:none;"></canvas>
+        </div>
+        <div class="camera-controls">
+          <button id="approveCaptureBtn">
+            <span class="material-icons">verified_user</span>
+            Capture & Approve
+          </button>
+          <button id="cancelApproveBtn" class="secondary-btn">
+            <span class="material-icons">cancel</span>
+            Cancel
+          </button>
+        </div>
+      </section>
+      
+      <!-- Session Active -->
+      <section id="sessionSection" class="hidden">
+        <h2>✅ Session Active</h2>
+        <div class="session-info">
+          <div class="user-card">
+            <span class="material-icons user-icon">account_circle</span>
+            <div>
+              <h3>Welcome, <span id="sessionUserName"></span>!</h3>
+              <p><strong>Class:</strong> <span id="sessionClass"></span></p>
+              <p><strong>Roll:</strong> <span id="sessionRoll"></span></p>
+              <p><strong>Session ID:</strong></p>
+              <div class="session-string" id="sessionString"></div>
+            </div>
+          </div>
+        </div>
+        <div class="button-group">
+          <button id="endSessionBtn" class="danger-btn">
+            <span class="material-icons">logout</span>
+            End Session
+          </button>
+          <button onclick="showSection('introSection')" class="secondary-btn">
+            <span class="material-icons">home</span>
+            Dashboard
+          </button>
+        </div>
+      </section>
+      
+      <!-- Admin Login -->
+      <section id="adminLoginSection" class="hidden">
+        <h2>🔐 Admin Panel Login</h2>
+        <div class="login-container">
+          <form id="adminLoginForm">
+            <label>Username:</label>
+            <input type="text" id="adminUser" placeholder="Username" required><br>
+            
+            <label>Password:</label>
+            <input type="password" id="adminPass" placeholder="Password" required><br>
+            
+            <button type="submit">
+              <span class="material-icons">login</span>
+              Login
+            </button>
+          </form>
+          <div id="adminLoginMsg" class="error-msg"></div>
+        </div>
+      </section>
+      
+      <!-- Admin Panel -->
+      <section id="adminPanelSection" class="hidden">
+        <div class="admin-header">
+          <h1>🛡️ Admin Control Panel</h1>
+          <div>
+            <button onclick="loadAdminData()" class="refresh-btn">
+              <span class="material-icons">refresh</span>
+              Refresh
+            </button>
+            <button onclick="logoutAdmin()" class="secondary-btn">
+              <span class="material-icons">logout</span>
+              Logout
+            </button>
+          </div>
+        </div>
+        
+        <div class="admin-boxes">
+          <div class="box">
+            <h3>
+              <span class="material-icons">people</span>
+              Registered Members (<span id="memberCount">0</span>)
+            </h3>
+            <ul id="approvedMembers">
+              <li class="empty-state">No members registered yet</li>
+            </ul>
+          </div>
+          
+          <div class="box">
+            <h3>
+              <span class="material-icons">timer</span>
+              Active Sessions (<span id="sessionCount">0</span>)
+            </h3>
+            <ul id="currentSessions">
+              <li class="empty-state">No active sessions</li>
+            </ul>
+          </div>
+          
+          <div class="box full-width">
+            <h3>
+              <span class="material-icons">manage_accounts</span>
+              User Management
+            </h3>
+            <div id="userInfo">
+              <p class="empty-state">No users registered</p>
+            </div>
+          </div>
+          
+          <div class="box full-width">
+            <h3>
+              <span class="material-icons">terminal</span>
+              System Console
+            </h3>
+            <pre id="consoleView">Waiting for system logs...</pre>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div id="editModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Edit User</h3>
+      <form id="editUserForm">
+        <input type="hidden" id="editOldName">
+        <label>Name:</label>
+        <input type="text" id="editName" required><br>
+        <label>Class:</label>
+        <input type="text" id="editClass" required><br>
+        <label>Roll:</label>
+        <input type="text" id="editRoll" required><br>
+        <div class="modal-buttons">
+          <button type="submit">Save Changes</button>
+          <button type="button" onclick="closeEditModal()" class="secondary-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script src="/static/app.js"></script>
+</body>
+</html>
